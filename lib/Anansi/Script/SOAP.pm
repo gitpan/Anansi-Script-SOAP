@@ -12,14 +12,15 @@ Anansi::Script::SOAP - Defines the mechanisms specific to handling SOAP.
 =head1 DESCRIPTION
 
 This module is designed to be an optional component module for use by the
-"Anansi::Script" component management module.  It defines the processes specific
-to handling both input and output from Perl scripts that are executed by a web
-server using the Simple Object Access Protocol.
+L<Anansi::Script> component management module.  It defines the processes
+specific to handling both input and output from Perl scripts that are executed
+by a web server using the Simple Object Access Protocol.  See
+L<Anansi::Component> for inherited methods.
 
 =cut
 
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use base qw(Anansi::Component);
 
@@ -80,7 +81,7 @@ sub loadParameters {
     my ($self, %parameters) = @_;
     $self->{PARAMETERS} = {} if(!defined($self->{PARAMETERS}));
     foreach my $name ($self->{CGI}->param()) {
-        %{$self->{PARAMETERS}}->{$name} = $self->{CGI}->param($name);
+        ${$self->{PARAMETERS}}{$name} = $self->{CGI}->param($name);
     }
 }
 
@@ -153,17 +154,17 @@ sub parameter {
     } elsif(1 == scalar(@_)) {
         my $name = shift(@_);
         return if(!defined($self->{PARAMETERS}));
-        return if(!defined(%{$self->{PARAMETERS}}->{$name}));
-        return %{$self->{PARAMETERS}}->{$name};
+        return if(!defined(${$self->{PARAMETERS}}{$name}));
+        return ${$self->{PARAMETERS}}{$name};
     } elsif(1 == scalar(@_) % 2) {
         return 0;
     }
     my ($name, %parameters) = @_;
     foreach my $name (keys(%parameters)) {
-        if(defined(%{$self->{PARAMETERS}}->{$name})) {
-            %{$self->{PARAMETERS}}->{$name} = $parameters{$name};
+        if(defined(${$self->{PARAMETERS}}{$name})) {
+            ${$self->{PARAMETERS}}{$name} = $parameters{$name};
         } else {
-            delete(%{$self->{PARAMETERS}}->{$name});
+            delete(${$self->{PARAMETERS}}{$name});
         }
     }
     return 1;
